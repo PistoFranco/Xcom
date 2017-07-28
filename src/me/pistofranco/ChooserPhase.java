@@ -8,17 +8,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class Chooser implements Listener {
+public class ChooserPhase implements Listener {
     String SPECIALITY = ChatColor.YELLOW + "Speciality selected: " + ChatColor.AQUA;
     String HABILITIES = ChatColor.GRAY + "Hability selected: " + ChatColor.AQUA;
+
     @EventHandler
     public void KitSelector(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         Entity e = event.getRightClicked();
-        if (GameState.getCurrent() == GameState.CHOOSING) {
+        if(GameState.getCurrent() == GameState.CREATING){
+            return;
+        }else if (GameState.getCurrent() == GameState.CHOOSING) {
             if (e instanceof ItemFrame) {
                 if (player.getInventory().getItemInMainHand().getType() == Material.BARRIER) {
                     player.sendMessage(ChatColor.RED + "You can't put nothing in that slot!");
@@ -29,23 +31,27 @@ public class Chooser implements Listener {
                     switch (((ItemFrame) e).getItem().getType()) {
                         case DIAMOND_CHESTPLATE: {
                             event.setCancelled(true);
-                            player.sendTitle("", SPECIALITY + "Juggernaut");
-                            player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_CHESTPLATE));
+                                player.sendTitle("", SPECIALITY + "Juggernaut");
+                                player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_CHESTPLATE));
+                                return;
                         }
                         case BOW: {
                             event.setCancelled(true);
                             player.sendTitle("", SPECIALITY + "Archer");
                             player.getInventory().setItem(0, new ItemStack(Material.BOW));
+                            return;
                         }
                         case TNT: {
                             event.setCancelled(true);
                             player.sendTitle("", SPECIALITY + "Bomber");
                             player.getInventory().setItem(0, new ItemStack(Material.TNT));
+                            return;
                         }
                         case SHIELD: {
                             event.setCancelled(true);
                             player.sendTitle("", HABILITIES + "Shield");
                             player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.SHIELD));
+                            return;
                         }
                     }
                 }

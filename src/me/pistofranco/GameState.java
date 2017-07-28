@@ -7,7 +7,7 @@ import org.bukkit.ChatColor;
  * Created by Jordi M on 24/07/2017.
  */
 public enum GameState {
-    STARTING, IN_GAME, WAITING, RESTARTING,CHOOSING,CREATING;
+    STARTING, IN_GAME, WAITING,CHOOSING,CREATING;
     private static GameState current;
 
 

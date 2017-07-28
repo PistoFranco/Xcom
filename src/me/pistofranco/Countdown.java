@@ -2,7 +2,6 @@ package me.pistofranco;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -13,35 +12,34 @@ public class Countdown extends BukkitRunnable {
 
     int time = 10;
     private MainClass plugin;
-    public Teams teams = plugin.getTeams();
+    Teams teams;
 
     public Countdown(MainClass plugin) {
         this.plugin = plugin;
+        teams = plugin.getTeams();
     }
 
     @Override
     public void run() {
-        if (Bukkit.getOnlinePlayers().size() >= 1) {
-            if (time % 10 == 0) {
-                Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " +ChatColor.AQUA+ time);
-            }
-            if (time < 10 && time > 0) {
-                Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " +ChatColor.AQUA+ time);
-            }
-            if (time == 0) {
-                plugin.stopCountdown();
-                for (Player playr:Bukkit.getOnlinePlayers()) {
-                    teams.addRed(playr.getUniqueId());
+        if (GameState.getCurrent() == GameState.STARTING) {
+            if (Bukkit.getOnlinePlayers().size() >= 1) {
+                if (time % 10 == 0) {
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + time);
                 }
-                GameState.setCurrent(GameState.IN_GAME);
-                plugin.getListener().startGame();
-                return;
-
+                if (time < 10 && time > 0) {
+                    Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + time);
+                }
+                if (time == 0) {
+                    plugin.stopCountdown();
+                    plugin.startCountdownChoosing();
+                    GameState.setCurrent(GameState.CHOOSING);
+                    return;
+                }
+                time--;
+            } else {
+                plugin.stopCountdown();
+                plugin.startCountdown();
             }
-            time--;
-        } else {
-            plugin.stopCountdown();
-            plugin.startCountdown();
         }
     }
 }
