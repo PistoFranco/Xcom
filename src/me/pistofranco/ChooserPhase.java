@@ -1,7 +1,9 @@
 package me.pistofranco;
 
+import me.pistofranco.resouces.Items;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -28,30 +30,36 @@ public class ChooserPhase implements Listener {
                     return;
                     //SPECIALIST
                 } else {
+                    event.setCancelled(true);
                     switch (((ItemFrame) e).getItem().getType()) {
                         case DIAMOND_CHESTPLATE: {
-                            event.setCancelled(true);
                                 player.sendTitle("", SPECIALITY + "Juggernaut");
                                 player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_CHESTPLATE));
+                                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
                                 return;
                         }
                         case BOW: {
-                            event.setCancelled(true);
                             player.sendTitle("", SPECIALITY + "Archer");
-                            player.getInventory().setItem(0, new ItemStack(Material.BOW));
+                            player.getInventory().setItem(0, Items.sniperBow());
+                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
                             return;
                         }
                         case TNT: {
-                            event.setCancelled(true);
                             player.sendTitle("", SPECIALITY + "Bomber");
-                            player.getInventory().setItem(0, new ItemStack(Material.TNT));
+                            player.getInventory().setItem(0, Items.tntBomb());
+                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
                             return;
                         }
                         case SHIELD: {
-                            event.setCancelled(true);
                             player.sendTitle("", HABILITIES + "Shield");
-                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(), new ItemStack(Material.SHIELD));
+                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(), Items.shield());
+                            player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH,1f,1f);
                             return;
+                        }
+                        case DIAMOND_HELMET:{
+                            player.sendTitle("",SPECIALITY+ "Detector");
+                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(),Items.helmet());
+                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
                         }
                     }
                 }

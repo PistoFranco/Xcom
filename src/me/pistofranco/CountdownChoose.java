@@ -2,6 +2,8 @@ package me.pistofranco;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class CountdownChoose extends BukkitRunnable{
@@ -20,9 +22,15 @@ public class CountdownChoose extends BukkitRunnable{
             if (Bukkit.getOnlinePlayers().size() >= 1) {
                 if (time % 10 == 0) {
                     Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + time);
+                    for (Player inside: Bukkit.getOnlinePlayers()) {
+                        inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK,1f,1f);
+                    }
                 }
                 if (time < 10 && time > 0) {
                     Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + time);
+                    for (Player inside: Bukkit.getOnlinePlayers()) {
+                        inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK,1f,1f);
+                    }
                 }
                 if (time == 0) {
                     plugin.stopCountdownChoosing();

@@ -27,17 +27,24 @@ public class Teams {
             Player player = Bukkit.getPlayer(red);
             player.sendMessage(ChatColor.RED + "This team is full");
         } else {
-            this.red.add(red);
-            Bukkit.broadcastMessage(ChatColor.RED + "Size: " + this.red.size());
+            if (blue.contains(red)) {
+                this.blue.remove(red);
+                this.red.add(red);
+            }else this.red.add(red);
         }
     }
 
     public void addBlue(UUID blue) {
+
         if (this.blue.size() == 4) {
+
             Player player = Bukkit.getPlayer(blue);
             player.sendMessage(ChatColor.RED + "This team is full");
         } else {
-            this.blue.add(blue);
+            if(red.contains(blue)){
+                this.red.remove(blue);
+                this.blue.add(blue);
+            }else this.blue.add(blue);
         }
     }
 
@@ -48,14 +55,6 @@ public class Teams {
         this.blue.remove(blue);
     }
 
-    public boolean isBlue(UUID player) {
-        for (UUID pl : blue) {
-            if (pl == player) {
-                return true;
-            }
-        }
-        return false;
-    }
     public boolean isRed(UUID player) {
         for (UUID pl : red) {
             if (pl == player) {
@@ -63,6 +62,12 @@ public class Teams {
             }
         }
         return false;
+    }
+    public List<UUID> getRedPlayers(){
+        return red;
+    }
+    public List<UUID> getBluePlayers(){
+        return blue;
     }
 
     public Player getPlayerRed(int number) {
@@ -96,14 +101,12 @@ public class Teams {
     public UUID getIdBlue(int number) {
         UUID pl;
         try {
-            Bukkit.broadcastMessage("Blue team size:" + blue.size());
             if (blue.get(number) != null) {
                 pl = blue.get(number);
                 return pl;
             }
             return null;
         } catch (IndexOutOfBoundsException e) {
-            Bukkit.broadcastMessage("Trying to get next player");
             pl = null;
         } catch (StackOverflowError error){
             GameState.setCurrent(GameState.WAITING);
@@ -116,17 +119,13 @@ public class Teams {
     public UUID getIdRed(int number) {
         UUID pl;
         try {
-            Bukkit.broadcastMessage("Red team size:" + red.size());
             if (red.get(number) != null) {
                 pl = red.get(number);
                 return pl;
             }
             return null;
         } catch (IndexOutOfBoundsException e) {
-            Bukkit.broadcastMessage("Trying to get next player");
             pl = null;
-        } catch (StackOverflowError error){
-            //TODO: Start finding another game
         }
         return null;
     }
