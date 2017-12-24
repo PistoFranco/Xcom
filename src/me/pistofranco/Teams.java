@@ -6,11 +6,10 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-/**
- * Created by Jordi M on 24/07/2017.
- */
+
 public class Teams {
     MainClass plugin;
 
@@ -28,22 +27,24 @@ public class Teams {
             player.sendMessage(ChatColor.RED + "This team is full");
         } else {
             if (blue.contains(red)) {
+                Player player = Bukkit.getPlayer(red);
                 this.blue.remove(red);
                 this.red.add(red);
+                player.sendMessage(this.blue.size()+"");
             }else this.red.add(red);
         }
     }
 
     public void addBlue(UUID blue) {
-
         if (this.blue.size() == 4) {
-
             Player player = Bukkit.getPlayer(blue);
             player.sendMessage(ChatColor.RED + "This team is full");
         } else {
             if(red.contains(blue)){
+                Player player = Bukkit.getPlayer(blue);
                 this.red.remove(blue);
                 this.blue.add(blue);
+                player.sendMessage(this.blue.size()+"");
             }else this.blue.add(blue);
         }
     }
@@ -56,48 +57,20 @@ public class Teams {
     }
 
     public boolean isRed(UUID player) {
-        for (UUID pl : red) {
-            if (pl == player) {
-                return true;
-            }
-        }
-        return false;
+        return red.contains(player);
+    }
+    public boolean isBlue(UUID player) {
+        return blue.contains(player);
     }
     public List<UUID> getRedPlayers(){
         return red;
     }
+
     public List<UUID> getBluePlayers(){
         return blue;
     }
 
-    public Player getPlayerRed(int number) {
-        UUID uuid;
-        Player pl;
-        try {
-            if (red.get(number) != null) {
-                uuid = red.get(number);
-                pl = Bukkit.getPlayer(uuid);
-                return pl;
-            }
-            return null;
-        }catch (IndexOutOfBoundsException e){
-            return null;
-        }
-    }
-    public Player getPlayerBlue(int number) {
-        UUID uuid;
-        Player pl;
-        try {
-            if (blue.get(number) != null) {
-                uuid = blue.get(number);
-                pl = Bukkit.getPlayer(uuid);
-                return pl;
-            }
-            return null;
-        }catch (IndexOutOfBoundsException e){
-            return null;
-        }
-    }
+
     public UUID getIdBlue(int number) {
         UUID pl;
         try {
@@ -108,14 +81,10 @@ public class Teams {
             return null;
         } catch (IndexOutOfBoundsException e) {
             pl = null;
-        } catch (StackOverflowError error){
-            GameState.setCurrent(GameState.WAITING);
-            plugin.startCountdown();
-            red.clear();
-            blue.clear();
         }
         return null;
     }
+
     public UUID getIdRed(int number) {
         UUID pl;
         try {
@@ -130,4 +99,11 @@ public class Teams {
         return null;
     }
 
+    public boolean hasTeam(UUID player) {
+        if (isRed(player))
+            return true;
+        if(isBlue(player))
+            return true;
+        return false;
+    }
 }

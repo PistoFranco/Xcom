@@ -5,7 +5,7 @@ import org.bukkit.ChatColor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Messages {
+public class  Messages {
 
     public static String usedHability(String habilityName,String playerName,boolean isRed){
         if(isRed){

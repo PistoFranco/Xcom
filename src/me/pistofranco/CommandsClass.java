@@ -22,7 +22,8 @@ public class CommandsClass implements CommandExecutor{
                 player.sendMessage(ChatColor.AQUA+"/mcrole (stop,start,creation,red,blue,spawn)");
             }else {
                 if(args[0].equalsIgnoreCase("stop")){
-                    plugin.stopCountdown();
+                    plugin.timeFirstCountdown = 0;
+                    plugin.timeSecondCountdown = 0;
                     GameState.setCurrent(GameState.CREATING);
                 }
                 if(args[0].equalsIgnoreCase("start")){
@@ -83,12 +84,12 @@ public class CommandsClass implements CommandExecutor{
                     }
                 }
                 if(args[0].equalsIgnoreCase("red")){
-                    Teams teams = plugin.getTeams();
+                    Teams teams = plugin.getTeamsClass();
                     teams.addRed(player.getUniqueId());
                     player.sendMessage(ChatColor.GREEN+"You are in the red team");
                 }
                 if(args[0].equalsIgnoreCase("blue")){
-                    Teams teams = plugin.getTeams();
+                    Teams teams = plugin.getTeamsClass();
                     teams.addBlue(player.getUniqueId());
                     player.sendMessage(ChatColor.GREEN+"You are in the blue team");
                 }

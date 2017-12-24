@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="Xcom">
-    <output-path>$USER_HOME$/Documents/Servers/Xcom/plugins</output-path>
+    <output-path>$USER_HOME$/Desktop/Servers/Xcom/plugins</output-path>
     <root id="archive" name="Xcom.jar">
       <element id="module-output" name="Xcom" />
     </root>

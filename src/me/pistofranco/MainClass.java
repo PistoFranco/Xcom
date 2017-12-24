@@ -1,46 +1,63 @@
 package me.pistofranco;
 
+import com.sun.javafx.collections.MappingChange;
+import me.pistofranco.Habilities.Hability;
+import me.pistofranco.Habilities.HabilityManager;
+import me.pistofranco.events.*;
 import me.pistofranco.resouces.Items;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
+import me.pistofranco.resouces.RoundManager;
+import me.pistofranco.resouces.Utils;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Jordi M on 24/07/2017.
  */
 public class MainClass extends JavaPlugin {
+
     private Teams teams;
-    private ListenersClass listeners;
-    private int taskID;
-    private int taskID2;
     public FileConfiguration config;
+    public RoundManager roundManager;
     Items items;
+    private Map<Player,HabilityManager> habilityManager = new HashMap<>();
+
+    int timeFirstCountdown = 10,timeSecondCountdown = 20;
 
     public void onEnable() {
         try {
             config = getConfig();
             createConfigurationFile();
-        }catch (Exception e1){
+        } catch (Exception e1) {
             e1.printStackTrace();
         }
         items = new Items(this);
         teams = new Teams(this);
-        listeners = new ListenersClass(this);
-        Bukkit.getPluginManager().registerEvents(listeners, this);
-        Bukkit.getPluginManager().registerEvents(new ChooserPhase(), this);
         getCommand("mcrole").setExecutor(new CommandsClass(this));
+        roundManager = new RoundManager(this);
+        registerEvents();
         startCountdown();
         GameState.setCurrent(GameState.STARTING);
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Xcom is enabled");
         World world = Bukkit.getWorld("world");
         world.setDifficulty(Difficulty.PEACEFUL);
-        world.setGameRuleValue("doMobSpawn","false");
-        world.setGameRuleValue("keepInventory","true");
+        world.setGameRuleValue("doMobSpawn", "false");
+        world.setGameRuleValue("keepInventory", "true");
+        world.setGameRuleValue("doDaylightCycle", "false");
+        world.setTime(10000);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                world.setWeatherDuration(0);
+            }
+        }.runTaskTimer(this, 100L, 100L);
     }
 
     public void onDisable() {
@@ -48,28 +65,88 @@ public class MainClass extends JavaPlugin {
     }
 
     public void startCountdown() {
-        taskID = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Countdown(this), 20L, 20L);
+        Utils utils = new Utils(this);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (GameState.getCurrent() == GameState.STARTING) {
+                    if (Bukkit.getOnlinePlayers().size() >= 1) {
+                        if (timeFirstCountdown % 10 == 0) {
+                            Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                        }
+                        if (timeFirstCountdown < 10 && timeFirstCountdown > 0) {
+                            Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                        }
+                        if (timeFirstCountdown == 0) {
+                            cancel();
+                            GameState.setCurrent(GameState.CHOOSING);
+                            utils.tpBluePlayers();
+                            utils.tpRedPlayers();
+                            startSecondCountdwn();
+                            for(Player player : Bukkit.getOnlinePlayers()){
+                                addHabilityManger(player);
+                            }
+                            return;
+                        }
+                        timeFirstCountdown--;
+                    }else {
+                        cancel();
+                        startCountdown();
+                    }
+                }
+            }
+        }.runTaskTimer(this,20L,20L);
     }
 
-    public void startCountdownChoosing() {
-        taskID2 = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new CountdownChoose(this), 20L, 20L);
+    public void startSecondCountdwn() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (GameState.getCurrent() == GameState.CHOOSING) {
+                    if (Bukkit.getOnlinePlayers().size() >= 1) {
+                        if (timeSecondCountdown % 10 == 0) {
+                            Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + timeSecondCountdown);
+                            for (Player inside : Bukkit.getOnlinePlayers()) {
+                                inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 1f, 1f);
+                            }
+                        }
+                        if (timeSecondCountdown < 10 && timeSecondCountdown > 0) {
+                            Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + timeSecondCountdown);
+                            for (Player inside : Bukkit.getOnlinePlayers()) {
+                                inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 1f, 1f);
+                            }
+                        }
+                        if (timeSecondCountdown == 0) {
+                            cancel();
+                            GameState.setCurrent(GameState.IN_GAME);
+                            roundManager.startGame();
+                            return;
+
+                        }
+                        timeSecondCountdown--;
+                    } else {
+                        cancel();
+                        startSecondCountdwn();
+                    }
+                }
+            }
+        }.runTaskTimer(this,20L,20L);
     }
 
-    public void stopCountdownChoosing() {
-        Bukkit.getServer().getScheduler().cancelTask(taskID2);
+
+    private void registerEvents(){
+        PluginManager pm = Bukkit.getPluginManager();
+
+        pm.registerEvents(new ChooserPhase(this), this);
+        pm.registerEvents(new onWalk(this),this);
+        pm.registerEvents(new onDeath(this),this);
+        pm.registerEvents(new onInteract(this),this);
+        pm.registerEvents(new onJoin(),this);
+        pm.registerEvents(new onShoot(this),this);
+        pm.registerEvents(new onQuit(this),this);
+        pm.registerEvents(new onDamagePlayer(this),this);
     }
 
-    public void stopCountdown() {
-        Bukkit.getServer().getScheduler().cancelTask(taskID);
-    }
-
-    public ListenersClass getListener() {
-        return listeners;
-    }
-
-    public Teams getTeams() {
-        return teams;
-    }
 
     private void createConfigurationFile() {
         if(!config.contains("settings.movements")) {
@@ -103,5 +180,31 @@ public class MainClass extends JavaPlugin {
         config.options().copyDefaults(true);
         saveConfig();
         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN+"Config.yml loaded correctly");
+    }
+
+    //LocalGetters for classes
+
+    public RoundManager getRoundManagerClass() {
+        return roundManager;
+    }
+    public Teams getTeamsClass() {
+        return teams;
+    }
+
+    //HABILITY MANAGER
+
+    public void addHabilityManger(Player player){
+        habilityManager.put(player,new HabilityManager(player));
+    }
+    public void removeHabilityManger(Player player){
+        habilityManager.remove(player,habilityManager.get(player));
+    }
+    public HabilityManager getHabilityManager(Player player){
+        for(Map.Entry<Player,HabilityManager> entry : habilityManager.entrySet()){
+            if(entry.getKey() == player){
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

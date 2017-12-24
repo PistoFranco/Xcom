@@ -1,5 +1,9 @@
-package me.pistofranco;
+package me.pistofranco.events;
 
+import me.pistofranco.GameState;
+import me.pistofranco.Habilities.Hability;
+import me.pistofranco.Habilities.HabilityManager;
+import me.pistofranco.MainClass;
 import me.pistofranco.resouces.Items;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,6 +17,16 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class ChooserPhase implements Listener {
+
+
+
+
+    private MainClass plugin;
+
+    public ChooserPhase(MainClass plugin) {
+        this.plugin = plugin;
+    }
+
     String SPECIALITY = ChatColor.YELLOW + "Speciality selected: " + ChatColor.AQUA;
     String HABILITIES = ChatColor.GRAY + "Hability selected: " + ChatColor.AQUA;
 
@@ -36,18 +50,24 @@ public class ChooserPhase implements Listener {
                                 player.sendTitle("", SPECIALITY + "Juggernaut");
                                 player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_CHESTPLATE));
                                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
+                                HabilityManager hability = plugin.getHabilityManager(player);
+                                hability.setHability(player, Hability.JUGGERNAUT);
                                 return;
                         }
                         case BOW: {
                             player.sendTitle("", SPECIALITY + "Archer");
                             player.getInventory().setItem(0, Items.sniperBow());
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
+                            HabilityManager hability = plugin.getHabilityManager(player);
+                            hability.setHability(player, Hability.MARKSMAN);
                             return;
                         }
                         case TNT: {
                             player.sendTitle("", SPECIALITY + "Bomber");
                             player.getInventory().setItem(0, Items.tntBomb());
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
+                            HabilityManager hability = plugin.getHabilityManager(player);
+                            hability.setHability(player, Hability.BOMBER);
                             return;
                         }
                         case SHIELD: {
