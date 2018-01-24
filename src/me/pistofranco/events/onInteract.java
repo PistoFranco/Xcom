@@ -76,6 +76,7 @@ public class onInteract implements Listener {
                                 }
                             } else noMovements.sendToPlayer(player1);
                         }
+                        return;
                     }
                     case BARRIER: {
                         if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -84,9 +85,9 @@ public class onInteract implements Listener {
                         return;
                     }
                     case TNT: {
-                        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
+                        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
                             event.setCancelled(true);
-                            final Location location = new Location(event.getClickedBlock().getWorld(), event.getClickedBlock().getX(), event.getClickedBlock().getY() + 1, event.getClickedBlock().getZ());
+                            final Location location = new Location(event.getClickedBlock().getWorld(), event.getClickedBlock().getX(), event.getClickedBlock().getY() + 1, event.getClickedBlock().getZ()); //Error when player dont
                             final ArmorStand armorStand = player1.getLocation().getWorld().spawn(location, ArmorStand.class);
                             armorStand.setVisible(false);
                             BukkitTask task = new BukkitRunnable() {
@@ -128,6 +129,7 @@ public class onInteract implements Listener {
                                 }
                             }.runTaskTimer(plugin, 10L, 10L);
                         }
+                        return;
                     }
                     case SHIELD: {
                         if (roundManager.getMovements() >= 10) {
@@ -144,12 +146,12 @@ public class onInteract implements Listener {
                             }
                         } else noMovements.sendToPlayer(player1);
                     }
+                    return;
                 }
             } else {
                 event.setCancelled(true);
+                cantTrow.sendToPlayer(player1);
             }
-        } else {
-            cantTrow.sendToPlayer(player1);
         }
     }
 }

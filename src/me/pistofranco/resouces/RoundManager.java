@@ -100,6 +100,9 @@ public class RoundManager {
             inside.playSound(inside.getLocation(), Sound.ENTITY_WITHER_DEATH,1f,1f);
             inside.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,30,10));
             inside.sendTitle("",ChatColor.GOLD+"Starting the game!",5,100,5);
+            Utils utils = new Utils(plugin);
+            utils.teleportPlayers();
+
         }
         newRound();
     }

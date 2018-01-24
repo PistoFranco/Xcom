@@ -55,7 +55,7 @@ public class Utils {
         }
     }
 
-    /*void teleportPlayers() {
+    void teleportPlayers() {
         int iblue = 0,ired = 0;
         for (UUID uuid:teams.getBluePlayers()) {
             Player blue = Bukkit.getPlayer(uuid);
@@ -81,7 +81,7 @@ public class Utils {
             red.getLocation().setYaw(0f);
             ired++;
         }
-    } */
+    }
 
     public Player getTargetPlayer(Player player, int max) {
         List<Player> possible = player.getNearbyEntities(max, max, max).stream().filter(entity -> entity instanceof Player).map(entity -> (Player) entity).filter(player::hasLineOfSight).collect(Collectors.toList());

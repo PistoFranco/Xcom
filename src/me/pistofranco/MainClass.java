@@ -1,8 +1,6 @@
 package me.pistofranco;
 
-import com.sun.javafx.collections.MappingChange;
-import me.pistofranco.Habilities.Hability;
-import me.pistofranco.Habilities.HabilityManager;
+import me.pistofranco.api.ActionBar;
 import me.pistofranco.events.*;
 import me.pistofranco.resouces.Items;
 import me.pistofranco.resouces.RoundManager;
@@ -10,13 +8,14 @@ import me.pistofranco.resouces.Utils;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Created by Jordi M on 24/07/2017.
@@ -26,8 +25,8 @@ public class MainClass extends JavaPlugin {
     private Teams teams;
     public FileConfiguration config;
     public RoundManager roundManager;
+    public static Inventory myInventory;
     Items items;
-    private Map<Player,HabilityManager> habilityManager = new HashMap<>();
 
     int timeFirstCountdown = 10,timeSecondCountdown = 20;
 
@@ -58,6 +57,9 @@ public class MainClass extends JavaPlugin {
                 world.setWeatherDuration(0);
             }
         }.runTaskTimer(this, 100L, 100L);
+        myInventory = Bukkit.createInventory(null, 9, "§6§lChoose Team!");
+        myInventory.setItem(3, Items.blueTeam());
+        myInventory.setItem(5,Items.redTeam());
     }
 
     public void onDisable() {
@@ -72,10 +74,16 @@ public class MainClass extends JavaPlugin {
                 if (GameState.getCurrent() == GameState.STARTING) {
                     if (Bukkit.getOnlinePlayers().size() >= 1) {
                         if (timeFirstCountdown % 10 == 0) {
-                            Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                            ActionBar ab = new ActionBar(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                            for(Player inside : Bukkit.getOnlinePlayers()){
+                                ab.sendToPlayer(inside);
+                            }
                         }
                         if (timeFirstCountdown < 10 && timeFirstCountdown > 0) {
-                            Bukkit.broadcastMessage(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                            ActionBar ab = new ActionBar(ChatColor.GOLD + "Choosing phase starts in: " + ChatColor.AQUA + timeFirstCountdown);
+                            for(Player inside : Bukkit.getOnlinePlayers()){
+                                ab.sendToPlayer(inside);
+                            }
                         }
                         if (timeFirstCountdown == 0) {
                             cancel();
@@ -84,7 +92,10 @@ public class MainClass extends JavaPlugin {
                             utils.tpRedPlayers();
                             startSecondCountdwn();
                             for(Player player : Bukkit.getOnlinePlayers()){
-                                addHabilityManger(player);
+                                    player.getInventory().setItem(1,new ItemStack(Material.BARRIER));
+                                    player.getInventory().setItem(6,new ItemStack(Material.BARRIER));
+                                    player.getInventory().setItem(7,new ItemStack(Material.BARRIER));
+                                    player.getInventory().setItem(8,Items.wandOfComunication());
                             }
                             return;
                         }
@@ -105,15 +116,18 @@ public class MainClass extends JavaPlugin {
                 if (GameState.getCurrent() == GameState.CHOOSING) {
                     if (Bukkit.getOnlinePlayers().size() >= 1) {
                         if (timeSecondCountdown % 10 == 0) {
-                            Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + timeSecondCountdown);
+                            ActionBar ab = new ActionBar(ChatColor.GOLD+""+ChatColor.BOLD + "The game starts in: " + ChatColor.AQUA+""+ChatColor.BOLD  + timeSecondCountdown);
                             for (Player inside : Bukkit.getOnlinePlayers()) {
+                                ab.sendToPlayer(inside);
                                 inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 1f, 1f);
                             }
                         }
                         if (timeSecondCountdown < 10 && timeSecondCountdown > 0) {
-                            Bukkit.broadcastMessage(ChatColor.GOLD + "The game starts in: " + ChatColor.AQUA + timeSecondCountdown);
+                            ActionBar ab = new ActionBar(actionBarCounter(10,timeSecondCountdown));
                             for (Player inside : Bukkit.getOnlinePlayers()) {
+                                ab.sendToPlayer(inside);
                                 inside.playSound(inside.getLocation(), Sound.BLOCK_COMPARATOR_CLICK, 1f, 1f);
+
                             }
                         }
                         if (timeSecondCountdown == 0) {
@@ -133,6 +147,24 @@ public class MainClass extends JavaPlugin {
         }.runTaskTimer(this,20L,20L);
     }
 
+    public String actionBarCounter(int seconds,int second){
+        StringBuilder sb = new StringBuilder();
+        sb.append(""+ChatColor.GREEN+10+"s"+ChatColor.WHITE+""+ChatColor.BOLD+"[ ");
+        for (int sec = seconds;sec >= 0;sec--){
+            if(sec == second){
+                sb.append(ChatColor.GREEN+"=");
+                continue;
+            }
+            if(sec > second){
+                sb.append(ChatColor.WHITE+"==");
+                continue;
+            }
+            sb.append(ChatColor.RED+"==");
+        }
+        sb.append(ChatColor.WHITE+"]"+ChatColor.GREEN+0+"s"+ChatColor.WHITE+" ");
+        return sb.toString();
+    }
+
 
     private void registerEvents(){
         PluginManager pm = Bukkit.getPluginManager();
@@ -141,10 +173,12 @@ public class MainClass extends JavaPlugin {
         pm.registerEvents(new onWalk(this),this);
         pm.registerEvents(new onDeath(this),this);
         pm.registerEvents(new onInteract(this),this);
-        pm.registerEvents(new onJoin(),this);
+        pm.registerEvents(new onJoin(this),this);
         pm.registerEvents(new onShoot(this),this);
         pm.registerEvents(new onQuit(this),this);
         pm.registerEvents(new onDamagePlayer(this),this);
+        pm.registerEvents(new onInventoryClick(this),this);
+        pm.registerEvents(new onDrop(),this);
     }
 
 
@@ -176,6 +210,9 @@ public class MainClass extends JavaPlugin {
         if(!config.contains("items.marksman_bow.movements")){
             config.addDefault("items.marksman_bow.movements",5);
         }
+        if(!config.contains("items.tntradar.movements")){
+            config.addDefault("items.tntradar.movements",5);
+        }
 
         config.options().copyDefaults(true);
         saveConfig();
@@ -189,22 +226,5 @@ public class MainClass extends JavaPlugin {
     }
     public Teams getTeamsClass() {
         return teams;
-    }
-
-    //HABILITY MANAGER
-
-    public void addHabilityManger(Player player){
-        habilityManager.put(player,new HabilityManager(player));
-    }
-    public void removeHabilityManger(Player player){
-        habilityManager.remove(player,habilityManager.get(player));
-    }
-    public HabilityManager getHabilityManager(Player player){
-        for(Map.Entry<Player,HabilityManager> entry : habilityManager.entrySet()){
-            if(entry.getKey() == player){
-                return entry.getValue();
-            }
-        }
-        return null;
     }
 }

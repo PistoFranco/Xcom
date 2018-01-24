@@ -1,8 +1,6 @@
 package me.pistofranco.events;
 
 import me.pistofranco.GameState;
-import me.pistofranco.Habilities.Hability;
-import me.pistofranco.Habilities.HabilityManager;
 import me.pistofranco.MainClass;
 import me.pistofranco.resouces.Items;
 import org.bukkit.ChatColor;
@@ -50,24 +48,18 @@ public class ChooserPhase implements Listener {
                                 player.sendTitle("", SPECIALITY + "Juggernaut");
                                 player.getInventory().setItem(0, new ItemStack(Material.DIAMOND_CHESTPLATE));
                                 player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
-                                HabilityManager hability = plugin.getHabilityManager(player);
-                                hability.setHability(player, Hability.JUGGERNAUT);
                                 return;
                         }
                         case BOW: {
                             player.sendTitle("", SPECIALITY + "Archer");
-                            player.getInventory().setItem(0, Items.sniperBow());
+                            player.getInventory().setItem(0, Items.marksmanBow());
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
-                            HabilityManager hability = plugin.getHabilityManager(player);
-                            hability.setHability(player, Hability.MARKSMAN);
                             return;
                         }
                         case TNT: {
                             player.sendTitle("", SPECIALITY + "Bomber");
                             player.getInventory().setItem(0, Items.tntBomb());
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
-                            HabilityManager hability = plugin.getHabilityManager(player);
-                            hability.setHability(player, Hability.BOMBER);
                             return;
                         }
                         case SHIELD: {
@@ -78,8 +70,13 @@ public class ChooserPhase implements Listener {
                         }
                         case DIAMOND_HELMET:{
                             player.sendTitle("",SPECIALITY+ "Detector");
-                            player.getInventory().setItem(player.getInventory().getHeldItemSlot(),Items.helmet());
+                            player.getInventory().setItem(0,Items.helmet());
                             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP,1f,1f);
+                        }
+                        case COMPASS:{
+                            player.sendTitle("",HABILITIES+ "TNT Radar");
+                            player.getInventory().setItem(0,Items.helmet());
+                            player.playSound(player.getLocation(), Sound.ENTITY_BLAZE_DEATH,1f,1f);
                         }
                     }
                 }

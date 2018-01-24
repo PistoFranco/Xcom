@@ -22,21 +22,42 @@ public class Items {
         banner.setItemMeta(meta);
         return banner;
     }
+
+    public static ItemStack tntRadar(){
+        ItemStack compass = new ItemStack(Material.COMPASS,1);
+        ItemMeta meta = compass.getItemMeta();
+        meta.setDisplayName(ChatColor.RED+"§f§l[§eTNT Radar§f§l]");
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.YELLOW+"Type: "+ChatColor.AQUA+"Informative"); //Invisible or Visible;
+        lore.add(ChatColor.YELLOW+"Damage: "+ChatColor.RED+"+0");
+        lore.add(ChatColor.YELLOW+"Movements: "+ChatColor.AQUA+plugin.getConfig().getInt("items.tntradar.movements"));
+        lore.add(ChatColor.YELLOW+"Effect duration: "+ChatColor.AQUA+"1 round");
+        lore.add("  ");
+        lore.add(ChatColor.AQUA+"Description:");
+        lore.add("   ");
+        lore.add(ChatColor.YELLOW+"Equip the TNT Radar,");
+        lore.add(ChatColor.YELLOW+"And see the invisible");
+        lore.add(ChatColor.YELLOW+"Bombs for 1 round");
+        compass.setItemMeta(meta);
+        return compass;
+    }
+
     public static ItemStack redTeam(){
-        ItemStack wool = new ItemStack(Material.WOOL,(short)14);
+        ItemStack wool = new ItemStack(Material.WOOL,1,(short)14);
         ItemMeta meta = wool.getItemMeta();
         meta.setDisplayName(ChatColor.RED+"Red team");
         wool.setItemMeta(meta);
         return wool;
     }
     public static ItemStack blueTeam(){
-        ItemStack wool = new ItemStack(Material.WOOL,(short)11);
+        ItemStack wool = new ItemStack(Material.WOOL,1,(short)11);
         ItemMeta meta = wool.getItemMeta();
         meta.setDisplayName(ChatColor.BLUE+"Blue team");
         wool.setItemMeta(meta);
         return wool;
     }
-    public static ItemStack sniperBow(){
+
+    public static ItemStack marksmanBow(){
         ItemStack item = new ItemStack(Material.BOW);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.GOLD+"Marksman bow");
@@ -48,9 +69,13 @@ public class Items {
         lore.add("  ");
         lore.add(ChatColor.AQUA+"Description:");
         lore.add("   ");
-        lore.add(ChatColor.YELLOW+"When you hit an enemy,");
-        lore.add(ChatColor.YELLOW+"you can see him trough");
-        lore.add(ChatColor.YELLOW+"the walls for 1 round");
+        lore.add(ChatColor.DARK_GREEN+"Passive");
+        lore.add(ChatColor.YELLOW+"Damage: "+ChatColor.RED+"+4");
+        lore.add("   ");
+        lore.add(ChatColor.DARK_GREEN+"Active");
+        lore.add(ChatColor.YELLOW+"When you shoot and,");
+        lore.add(ChatColor.YELLOW+"hit an enemy, you can see");
+        lore.add(ChatColor.YELLOW+"him through the walls for 1 round");
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;

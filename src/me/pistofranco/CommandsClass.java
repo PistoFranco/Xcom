@@ -1,5 +1,7 @@
 package me.pistofranco;
 
+import me.pistofranco.api.DefaultFontInfo;
+import me.pistofranco.resouces.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -7,11 +9,21 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+
 public class CommandsClass implements CommandExecutor{
     MainClass plugin;
+    private HashMap<String, String> COMMANDS;
 
     public CommandsClass(MainClass plugin) {
         this.plugin = plugin;
+        COMMANDS = new HashMap<>();
+        COMMANDS.put("stop", "Stop all the countdowns");
+        COMMANDS.put("start","Start the countdowns");
+        COMMANDS.put("creation","Enter creation mode & kick all the non OP players");
+        COMMANDS.put("red","Join RED team");
+        COMMANDS.put("blue","Join BLUE team");
+        COMMANDS.put("spawn","Sets the spawn to your position");
     }
 
     @Override
@@ -19,7 +31,11 @@ public class CommandsClass implements CommandExecutor{
         Player player = (Player)sender;
         if(label.equalsIgnoreCase("mcrole")){
             if(args.length < 1){
-                player.sendMessage(ChatColor.AQUA+"/mcrole (stop,start,creation,red,blue,spawn)");
+                DefaultFontInfo.sendCenteredMessage(player,"§6----"+"§aMinecraft Tactics"+"§6----");
+                for(String cmds : COMMANDS.keySet()) {
+                    DefaultFontInfo.sendCenteredMessage(player,"§2"+cmds+" §7"+COMMANDS.get(cmds));
+                }
+                DefaultFontInfo.sendCenteredMessage(player,"§6----"+"§aMinecraft Tactics"+"§6----");
             }else {
                 if(args[0].equalsIgnoreCase("stop")){
                     plugin.timeFirstCountdown = 0;
@@ -41,15 +57,14 @@ public class CommandsClass implements CommandExecutor{
                                 plugin.getConfig().set("spawn.blue."+target+".z",player.getLocation().getZ());
                                 plugin.saveConfig();
                                 player.sendMessage(ChatColor.GREEN+"Spawn created successfully!");
-                            }else player.sendMessage("usage: /mcrole spawn <team> <number 0 to 4>");
-                            if(target == 5){
+                            }else if(target == 5){
                                 plugin.getConfig().set("spawn.blue.choose.world",player.getLocation().getWorld().getName());
                                 plugin.getConfig().set("spawn.blue.choose.x",player.getLocation().getX());
                                 plugin.getConfig().set("spawn.blue.choose.y",player.getLocation().getY());
                                 plugin.getConfig().set("spawn.blue.choose.z",player.getLocation().getZ());
                                 plugin.saveConfig();
                                 player.sendMessage(ChatColor.GREEN+"Choosing spawn blue, created successfully!");
-                            }
+                            }else player.sendMessage("usage: /mcrole spawn <team> <number 0 to 4>");
                         }else if (args[1].equalsIgnoreCase("red")){
                             if(target <=4 && target >= 0){
                                 plugin.getConfig().set("spawn.red."+target+".world",player.getLocation().getWorld().getName());
@@ -92,6 +107,13 @@ public class CommandsClass implements CommandExecutor{
                     Teams teams = plugin.getTeamsClass();
                     teams.addBlue(player.getUniqueId());
                     player.sendMessage(ChatColor.GREEN+"You are in the blue team");
+                }
+                if(args[0].equalsIgnoreCase("help")){
+                    player.sendMessage("§6----"+"§aMinecraft Tactics"+"§6----");
+                    for(String cmds : COMMANDS.keySet()) {
+                        player.sendMessage("§2"+cmds+" §7"+COMMANDS.get(cmds));
+                    }
+                    player.sendMessage("§6----"+"§aMinecraft Tactics"+"§6----");
                 }
             }
         }

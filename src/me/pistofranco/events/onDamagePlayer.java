@@ -1,8 +1,6 @@
 package me.pistofranco.events;
 
 import me.pistofranco.GameState;
-import me.pistofranco.Habilities.Hability;
-import me.pistofranco.Habilities.HabilityManager;
 import me.pistofranco.MainClass;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -31,8 +29,7 @@ public class onDamagePlayer implements Listener {
                 Player damaged = (Player)event.getEntity();
                 Arrow arrow = (Arrow) event.getDamager();
                 Player shooter = (Player) arrow.getShooter();
-                HabilityManager hability = plugin.getHabilityManager(shooter);
-                if (hability.hasHability(Hability.MARKSMAN)) {
+                /*if (hability.hasHability(Hability.MARKSMAN)) {
                     new BukkitRunnable() {
                         int time = 10;
                         @Override
@@ -47,6 +44,7 @@ public class onDamagePlayer implements Listener {
                         }
                     }.runTaskTimer(plugin,0L,20L);
                 }
+                */
             }
         }
     }
